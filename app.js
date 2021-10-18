@@ -4,7 +4,7 @@ const morgan = require('morgan')
 const connect = require('./src/db/db')
 // @Express App
 const app = express()
-
+const PORT = process.env.PORT || 3000
 /*
     @Middlewares
 */
@@ -21,6 +21,6 @@ connect()
     @Routes
 */
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log('server started')
 })
