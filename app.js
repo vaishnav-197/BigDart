@@ -5,6 +5,7 @@ const connect = require('./src/db/db')
 const cors = require('cors')
 const helmet = require('helmet')
 const routes = require('./src/api/routes/route')
+require('dotenv').config()
 // @Express App
 const app = express()
 const PORT = process.env.PORT || 3000

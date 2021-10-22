@@ -1,5 +1,5 @@
-const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const { use } = require('passport')
 const User = require('../models/user')
 
 const auth = {
@@ -13,14 +13,7 @@ const auth = {
       confPassword,
       phone
     } = req.body
-    // ! debug
-    console.log(
-      email,
-      username,
-      password,
-      confPassword,
-      phone
-    )
+
     // * Input Validation
     if ((!username) || (!password) || (!email) || (!phone) || (!confPassword)) {
       res.status(400).send({
@@ -82,12 +75,45 @@ const auth = {
       }
     })
   }
-  }
+  },
 
   // //* Login
-  // login: () => {
-
-  // }
+  login: (req, res) => {
+    User.findOne({
+        email: req.body.email
+    }, function (err, user) {
+            if (err) throw err
+            if (!user) {
+                res.status(403).send({
+                  success: false,
+                  msg: 'Authentication Failed, User not found'
+                })
+                console.log('auth failed')
+            } else {
+                user.comparePassword(req.body.password, function (err, isMatch) {
+                    if (isMatch && !err) {
+                        const secret = process.env.SECRET
+                        const token = jwt.sign({
+                          id: user.id,
+                          email: user.email,
+                          username: user.username
+                        }, `${secret}`)
+                        res.status(200).send({
+                          success: true,
+                          token: token,
+                          user: user
+                        })
+                    } else {
+                        return res.status(403).send({
+                          success: false,
+                          msg: 'Authentication failed, wrong password'
+                        })
+                    }
+                })
+            }
+    }
+    )
+}
 
 }
 
